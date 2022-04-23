@@ -1,4 +1,4 @@
-const Pool = require("pg").Pool;
+const Pool = require("pg/lib").Pool;
 // Putting such credentials is not safe
 const pool = new Pool({
   user: "noteit_user",
@@ -12,12 +12,27 @@ const pool = new Pool({
 
 const getBooks = () => {
   return new Promise(function (resolve, reject) {
-    const query = "SELECT title FROM books;";
-    pool.query("SELECT * FROM books;", (error, results) => {
+    const query = "SELECT * FROM books;";
+    pool.query(query, (error, results) => {
       if (error) {
         reject(error);
       }
       console.log("RESULT", results, error);
+      resolve(results.rows);
+    });
+  });
+};
+
+const selectBook = (id) => {
+  return new Promise(function (resolve, reject) {
+    const query =
+      "SELECT * FROM books INNER JOIN quotes ON books.id=quotes.book_id INNER JOIN notes on books.id=notes.book_id WHERE books.id=$1";
+    console.log("SELECTING BOOK");
+    pool.query(query, [id], (error, results) => {
+      if (error) {
+        reject("select error", error);
+      }
+      console.log("SELECT RESULT", results, error);
       resolve(results.rows);
     });
   });
@@ -53,4 +68,5 @@ module.exports = {
   getBooks,
   createBook,
   deleteBook,
+  selectBook,
 };

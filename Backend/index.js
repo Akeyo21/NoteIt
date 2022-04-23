@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
   //res.status(200).send("Hello World!");
 });
 
-app.post("/book", (req, res) => {
+/*app.post("/book", (req, res) => {
   book_model
     .createBook(req.body)
     .then((response) => {
@@ -35,11 +35,22 @@ app.post("/book", (req, res) => {
     .catch((error) => {
       res.status(500).send(error);
     });
-});
+});*/
 
 app.delete("/books/:title", (req, res) => {
   book_model
     .deleteBook(req.params.title)
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
+app.get("/book/:id", (req, res) => {
+  book_model
+    .selectBook(req.params.id)
     .then((response) => {
       res.status(200).send(response);
     })
