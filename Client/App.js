@@ -7,61 +7,48 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, FlatList, Text, TouchableOpacity} from 'react-native';
-
+import {SafeAreaView, View, Text, ScrollView} from 'react-native';
+import Books from './components/Books';
 import {styles, DEFAULT_FONT} from './App.styles';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 const App = () => {
-  const [books, setBooks] = useState<[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const getBooks = () => {
-    fetch('http://localhost:3001')
-      .then(response => {
-        return response.json();
-      })
-      .then(data => {
-        console.log('DATA', data);
-        setBooks(data);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    getBooks();
-  }, []);
-  if (loading) {
-    return <Text>LOADING!!</Text>;
-  }
-
-  console.log('BOOKS', books);
-  books.length === 0
-    ? console.log('NO books', books)
-    : console.log(' BOOKS', books);
   const Stack = createNativeStackNavigator();
-  const renderBook = (item, navigation) => {
-    return (
-      <TouchableOpacity
-        style={styles.bookView}
-        onPress={() => navigation.navigate('Book')}>
-        <Text style={[styles.allTexts, styles.bookTitle]}>{item.title}</Text>
-        <Text style={[styles.allTexts, styles.author]}>{item.author}</Text>
-      </TouchableOpacity>
-    );
-  };
-  const Books = ({navigation}) => {
+
+  const Book = ({route, navigation}) => {
+    const selectedBookId = route.params.bookId;
+    const [selectedBook, setSelectedBook] = useState({});
+    const [loading, setLoading] = useState(false);
+    const selectBook = () => {
+      fetch(`http://localhost:3001/book/${selectedBookId}`)
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          console.log('BOOK', data);
+          setSelectedBook(data[0]);
+          setLoading(false);
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    };
+
+    useEffect(() => {
+      selectBook();
+    }, []);
+    if (loading) {
+      return <Text>LOADING!!</Text>;
+    }
     return (
       <SafeAreaView>
-        <FlatList
-          data={books}
-          renderItem={({item}) => renderBook(item, navigation)}
-        />
+        <View style={styles.bookContainer}>
+          <Text style={styles.bookTitle}>{selectedBook.title}</Text>
+          <Text style={styles.bookAuthor}>{selectedBook.author}</Text>
+        </View>
       </SafeAreaView>
     );
-  };
-  const Book = () => {
-    return <Text>YOU ARE HERE</Text>;
   };
   return (
     <NavigationContainer>
@@ -77,7 +64,11 @@ const App = () => {
             },
           }}
         />
-        <Stack.Screen name="Book" component={Book} />
+        <Stack.Screen
+          name="Book"
+          component={Book}
+          options={{headerTitle: ''}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
