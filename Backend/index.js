@@ -59,6 +59,17 @@ app.get("/book/:id", (req, res) => {
     });
 });
 
+app.get("/book/:bookId/chapter/:chapterId", (req, res) => {
+  book_model
+    .selectChapter(req.params.bookId, req.params.chapterId)
+    .then((response) => {
+      res.status(200).send(response);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
 app.listen(port, () => {
   console.log(`App running on port ${port}.`);
 });
