@@ -6,49 +6,29 @@
  * @flow strict-local
  */
 
-import React, {useEffect, useState} from 'react';
-import {SafeAreaView, View, Text, ScrollView} from 'react-native';
-import Books from './components/Books';
+import React, {useEffect, useState, useRef} from 'react';
+import {
+  SafeAreaView,
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import Books from './components/Books/Books';
 import {styles, DEFAULT_FONT} from './App.styles';
 
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
+import Book from './components/Book/Book';
 const App = () => {
   const Stack = createNativeStackNavigator();
 
-  const Book = ({route, navigation}) => {
-    const selectedBookId = route.params.bookId;
-    const [selectedBook, setSelectedBook] = useState({});
-    const [loading, setLoading] = useState(false);
-    const selectBook = () => {
-      fetch(`http://localhost:3001/book/${selectedBookId}`)
-        .then(response => {
-          return response.json();
-        })
-        .then(data => {
-          console.log('BOOK', data);
-          setSelectedBook(data[0]);
-          setLoading(false);
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    };
-
-    useEffect(() => {
-      selectBook();
-    }, []);
-    if (loading) {
-      return <Text>LOADING!!</Text>;
-    }
-    return (
-      <SafeAreaView>
-        <View style={styles.bookContainer}>
-          <Text style={styles.bookTitle}>{selectedBook.title}</Text>
-          <Text style={styles.bookAuthor}>{selectedBook.author}</Text>
-        </View>
-      </SafeAreaView>
-    );
+  const Chapter = () => {
+    /**
+     * Displays the chapter information such as the quotes
+     * and the notes associated with the chapter
+     */
+    return <Text>Chapter</Text>;
   };
   return (
     <NavigationContainer>
@@ -67,6 +47,12 @@ const App = () => {
         <Stack.Screen
           name="Book"
           component={Book}
+          options={{headerTitle: ''}}
+        />
+
+        <Stack.Screen
+          name="Chapter"
+          component={Chapter}
           options={{headerTitle: ''}}
         />
       </Stack.Navigator>
