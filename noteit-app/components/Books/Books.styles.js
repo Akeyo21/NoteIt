@@ -1,6 +1,4 @@
-import {StyleSheet, Dimensions} from 'react-native';
-const height = Dimensions.get('screen').height;
-console.log('HEIGHT', height);
+import {StyleSheet} from 'react-native';
 export const DEFAULT_FONT = 'Bodoni 72';
 export const styles = StyleSheet.create({
   bookView: {
@@ -27,10 +25,7 @@ export const styles = StyleSheet.create({
     fontFamily: DEFAULT_FONT,
   },
   addButtonContainer: {
-    //backgroundColor: 'red',
     position: 'absolute',
-    //top: 0,
-    //left: 0,
     bottom: 30,
     right: 20,
     zIndex: 5,
