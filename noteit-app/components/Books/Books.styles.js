@@ -30,4 +30,8 @@ export const styles = StyleSheet.create({
     right: 20,
     zIndex: 5,
   },
+  addBookIcon: {
+    width: 60,
+    height: 60,
+  },
 });

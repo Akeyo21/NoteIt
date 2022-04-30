@@ -53,7 +53,7 @@ const Books = ({navigation}) => {
       <TouchableOpacity
         style={styles.addButtonContainer}
         onPress={() => setCreateBook(true)}>
-        <Image source={require('../add.png')} style={{width: 60, height: 60}} />
+        <Image source={require('../add.png')} style={styles.addBookIcon} />
       </TouchableOpacity>
 
       <AddBookModal
