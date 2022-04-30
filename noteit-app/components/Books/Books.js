@@ -5,9 +5,6 @@ import {
   Text,
   TouchableOpacity,
   Image,
-  Modal,
-  View,
-  TextInput,
 } from 'react-native';
 import {styles} from './Books.styles';
 import AddBookModal from '../AddBook/AddBookModal';
