@@ -40,7 +40,6 @@ const Books = ({navigation}) => {
       </TouchableOpacity>
     );
   };
-  console.log('SHOW MODAL', openCreateBookModal);
   return (
     <>
       <SafeAreaView>
