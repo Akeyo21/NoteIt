@@ -51,7 +51,6 @@ const Book = ({route, navigation}) => {
         <Text style={styles.bookTitle}>{bookTitle}</Text>
         <Text style={styles.bookAuthor}>{bookAuthor}</Text>
 
-        <Text style={styles.chapters}>Interesting chapters</Text>
         <Carousel
           style={styles.carousel}
           renderItem={renderQuotes}
@@ -67,15 +66,19 @@ const Book = ({route, navigation}) => {
           activeDotIndex={activeIndex}
           dotsLength={displayQuotes.length}
         />
+
+        <Text style={styles.chapters}>Interesting chapters</Text>
+
         {bookChapters?.map((bookChapter, index) => (
           <TouchableOpacity
-            onPress={navigation.navigate('Chapter', {
-              bookId: selectedBookId,
-              chapterId: bookChapter.id,
-            })}>
-            <Text key={index} style={styles.chapterTitles}>
-              {bookChapter.title}
-            </Text>
+            key={index}
+            onPress={() =>
+              navigation.navigate('Chapter', {
+                bookId: selectedBookId,
+                chapterId: bookChapter.id,
+              })
+            }>
+            <Text style={styles.chapterTitles}>{bookChapter.title}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
