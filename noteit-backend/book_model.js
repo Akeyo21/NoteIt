@@ -7,12 +7,10 @@ const pool = new Pool({
   password: "12345",
   port: 5432,
 });
-
-// Define functions that query the book model
-const getAllBooks = () => {
+const queryDB = (query, ...args) => {
+  console.log("ARGUMENTS PASSED", args);
   return new Promise(function (resolve, reject) {
-    const query = "SELECT * FROM books;";
-    pool.query(query, (error, results) => {
+    pool.query(query, args, (error, results) => {
       if (error) {
         reject(error);
       }
@@ -21,76 +19,65 @@ const getAllBooks = () => {
     });
   });
 };
+// Define functions that query the book model
+const getAllBooks = () => {
+  const query = "SELECT * FROM books;";
+  return queryDB(query);
+};
 
-const selectBook = (args) => {
+const selectBook = (...args) => {
   const bookId = args[0];
   return new Promise(function (resolve, reject) {
-    const query =
+    // Querying for book chapters
+    const bookChaptersQuery =
       "SELECT books.title as bookTitle, author, chapters.title, chapters.id FROM books INNER JOIN chapters ON books.id=chapters.book_id WHERE books.id=$1";
     const queryResults = {};
-    pool.query(query, [bookId], (error, results) => {
-      if (error) {
-        reject(error);
-      }
-      console.log("SELECT RESULT", results.rows);
-      queryResults.chapters = results.rows;
-      pool.query(
-        "SELECT quote FROM books INNER JOIN quotes ON books.id=quotes.book_id WHERE books.id=$1 LIMIT 5",
-        [bookId],
-        (error, results) => {
-          if (error) {
-            reject(error);
-          }
-          console.log("SELECT RESULT", results.rows);
-          queryResults.quotes = results.rows;
-          resolve(queryResults);
-        }
-      );
-    });
+    return queryDB(bookChaptersQuery, bookId)
+      .then((result) => {
+        queryResults.chapters = result;
+        // Querying for 5 quotes for the book
+        const quotesQuery =
+          "SELECT quote FROM books INNER JOIN quotes ON books.id=quotes.book_id WHERE books.id=$1 LIMIT 5";
+        queryDB(quotesQuery, bookId)
+          .then((results) => {
+            queryResults.quotes = results;
+            resolve(queryResults);
+          })
+          .catch((e) => reject(e));
+      })
+      .catch((e) => reject(e));
   });
 };
 
-const selectChapter = (args) => {
+const selectChapter = (...args) => {
   const bookId = args[0];
   const chapterId = args[1];
   return new Promise(function (resolve, reject) {
-    // Selecting book
-    console.log("BOOK ID", bookId);
-    const query = "SELECT title, author FROM books WHERE books.id=$1";
+    // Querying for book info
+    const bookQuery = "SELECT title, author FROM books WHERE books.id=$1";
     const queryResults = {};
-    pool.query(query, [bookId], (error, results) => {
-      if (error) {
-        reject(error);
-      }
-      console.log("SELECT book RESULT", results.rows);
-      queryResults.book = results.rows;
-      // selecting quotes
-      pool.query(
-        "SELECT quote FROM books INNER JOIN quotes ON books.id=quotes.book_id INNER JOIN chapters ON quotes.chapter_id = chapters.id WHERE books.id=$1 AND chapters.id=$2",
-        [bookId, chapterId],
-        (error, results) => {
-          if (error) {
-            reject(error);
-          }
-          console.log("SELECT query RESULT", results.rows);
-          // select notes
-          queryResults.quotes = results.rows;
-          pool.query(
-            "SELECT note FROM books INNER JOIN notes ON books.id=notes.book_id INNER JOIN chapters ON notes.chapter_id = chapters.id WHERE books.id=$1 AND chapters.id=$2",
-            [bookId, chapterId],
-            (error, results) => {
-              if (error) {
-                reject(error);
-              }
-              console.log("SELECT notes RESULT", results.rows);
-              // select notes
-              queryResults.notes = results.rows;
-              resolve(queryResults);
-            }
-          );
-        }
-      );
-    });
+    return queryDB(bookQuery, bookId)
+      .then((results) => {
+        queryResults.book = results;
+        // Selecting quotes under the chapter
+        const quotesQuery =
+          "SELECT quote FROM books INNER JOIN quotes ON books.id=quotes.book_id INNER JOIN chapters ON quotes.chapter_id = chapters.id WHERE books.id=$1 AND chapters.id=$2";
+        queryDB(quotesQuery, bookId, chapterId)
+          .then((results) => {
+            queryResults.quotes = results;
+            // Selecting notes under the query
+            const chapterNotesQuery =
+              "SELECT note FROM books INNER JOIN notes ON books.id=notes.book_id INNER JOIN chapters ON notes.chapter_id = chapters.id WHERE books.id=$1 AND chapters.id=$2";
+            queryDB(chapterNotesQuery, bookId, chapterId)
+              .then((result) => {
+                queryResults.notes = results;
+                resolve(queryResults);
+              })
+              .catch((e) => reject(e));
+          })
+          .catch((e) => reject(e));
+      })
+      .catch((e) => reject(e));
   });
 };
 
