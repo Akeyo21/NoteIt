@@ -14,16 +14,32 @@ app.use(function (req, res, next) {
   );
   next();
 });
-app.get("/", (req, res) => {
-  book_model
-    .getBooks()
+
+const runModelFunction = (req, res, modelFunction, ...modelFunctionArgs) => {
+  modelFunction(...modelFunctionArgs)
     .then((response) => {
       res.status(200).send(response);
     })
     .catch((error) => {
       res.status(500).send(error);
     });
-  //res.status(200).send("Hello World!");
+};
+app.get("/", (req, res) => {
+  runModelFunction(req, res, book_model.getAllBooks);
+});
+
+app.get("/book/:id", (req, res) => {
+  runModelFunction(req, res, book_model.selectBook, req.params.id);
+});
+
+app.get("/book/:bookId/chapter/:chapterId", (req, res) => {
+  runModelFunction(
+    req,
+    res,
+    book_model.selectChapter,
+    req.params.bookId,
+    req.params.chapterId
+  );
 });
 
 /*app.post("/book", (req, res) => {
@@ -37,38 +53,9 @@ app.get("/", (req, res) => {
     });
 });*/
 
-app.delete("/books/:title", (req, res) => {
-  book_model
-    .deleteBook(req.params.title)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
-
-app.get("/book/:id", (req, res) => {
-  book_model
-    .selectBook(req.params.id)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
-
-app.get("/book/:bookId/chapter/:chapterId", (req, res) => {
-  book_model
-    .selectChapter(req.params.bookId, req.params.chapterId)
-    .then((response) => {
-      res.status(200).send(response);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
+/*app.delete("/books/:title", (req, res) => {
+  runModelFunction(req, res, book_model.deleteBook, req.params.title);
+});*/
 
 app.listen(port, () => {
   console.log(`App running on port ${port}.`);
