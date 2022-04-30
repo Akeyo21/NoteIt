@@ -9,7 +9,7 @@ const pool = new Pool({
 });
 
 // Define functions that query the book model
-const getBooks = () => {
+const getAllBooks = () => {
   return new Promise(function (resolve, reject) {
     const query = "SELECT * FROM books;";
     pool.query(query, (error, results) => {
@@ -22,23 +22,24 @@ const getBooks = () => {
   });
 };
 
-const selectBook = (id) => {
+const selectBook = (args) => {
+  const bookId = args[0];
   return new Promise(function (resolve, reject) {
     const query =
       "SELECT books.title as bookTitle, author, chapters.title, chapters.id FROM books INNER JOIN chapters ON books.id=chapters.book_id WHERE books.id=$1";
     const queryResults = {};
-    pool.query(query, [id], (error, results) => {
+    pool.query(query, [bookId], (error, results) => {
       if (error) {
-        reject("select error", error);
+        reject(error);
       }
       console.log("SELECT RESULT", results.rows);
       queryResults.chapters = results.rows;
       pool.query(
         "SELECT quote FROM books INNER JOIN quotes ON books.id=quotes.book_id WHERE books.id=$1 LIMIT 5",
-        [id],
+        [bookId],
         (error, results) => {
           if (error) {
-            reject("select error", error);
+            reject(error);
           }
           console.log("SELECT RESULT", results.rows);
           queryResults.quotes = results.rows;
@@ -49,7 +50,9 @@ const selectBook = (id) => {
   });
 };
 
-const selectChapter = (bookId, chapterId) => {
+const selectChapter = (args) => {
+  const bookId = args[0];
+  const chapterId = args[1];
   return new Promise(function (resolve, reject) {
     // Selecting book
     console.log("BOOK ID", bookId);
@@ -57,7 +60,7 @@ const selectChapter = (bookId, chapterId) => {
     const queryResults = {};
     pool.query(query, [bookId], (error, results) => {
       if (error) {
-        reject("select error", error);
+        reject(error);
       }
       console.log("SELECT book RESULT", results.rows);
       queryResults.book = results.rows;
@@ -67,7 +70,7 @@ const selectChapter = (bookId, chapterId) => {
         [bookId, chapterId],
         (error, results) => {
           if (error) {
-            reject("select error", error);
+            reject(error);
           }
           console.log("SELECT query RESULT", results.rows);
           // select notes
@@ -77,7 +80,7 @@ const selectChapter = (bookId, chapterId) => {
             [bookId, chapterId],
             (error, results) => {
               if (error) {
-                reject("select error", error);
+                reject(error);
               }
               console.log("SELECT notes RESULT", results.rows);
               // select notes
@@ -91,7 +94,7 @@ const selectChapter = (bookId, chapterId) => {
   });
 };
 
-const createBook = (body) => {
+/*const createBook = (body) => {
   return new Promise(function (resolve, reject) {
     const { title, author } = body;
     const query =
@@ -115,12 +118,12 @@ const deleteBook = () => {
       resolve(`Deleted book with title ${request.params.title}`);
     });
   });
-};
+};*/
 
 module.exports = {
-  getBooks,
-  createBook,
-  deleteBook,
+  getAllBooks,
+  //createBook,
+  //deleteBook,
   selectBook,
   selectChapter,
 };
