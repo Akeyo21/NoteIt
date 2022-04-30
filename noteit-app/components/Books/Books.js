@@ -1,6 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {SafeAreaView, FlatList, Text, TouchableOpacity} from 'react-native';
-
+import {
+  SafeAreaView,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import AddSVG from '../add.png';
 import {styles} from './Books.styles';
 const Books = ({navigation}) => {
   const [books, setBooks] = useState([]);
@@ -34,12 +40,18 @@ const Books = ({navigation}) => {
     );
   };
   return (
-    <SafeAreaView>
-      <FlatList
-        data={books}
-        renderItem={({item}) => renderBook(item, navigation)}
-      />
-    </SafeAreaView>
+    <>
+      <SafeAreaView>
+        <FlatList
+          data={books}
+          renderItem={({item}) => renderBook(item, navigation)}
+        />
+      </SafeAreaView>
+
+      <TouchableOpacity style={styles.addButtonContainer}>
+        <Image source={require('../add.png')} style={{width: 60, height: 60}} />
+      </TouchableOpacity>
+    </>
   );
 };
 
