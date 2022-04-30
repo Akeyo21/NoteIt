@@ -5,12 +5,16 @@ import {
   Text,
   TouchableOpacity,
   Image,
+  Modal,
+  View,
+  TextInput,
 } from 'react-native';
-import AddSVG from '../add.png';
 import {styles} from './Books.styles';
+import AddBookModal from '../AddBook/AddBookModal';
 const Books = ({navigation}) => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openCreateBookModal, setCreateBook] = useState(false);
   const getBooks = () => {
     fetch('http://localhost:3001')
       .then(response => {
@@ -39,6 +43,7 @@ const Books = ({navigation}) => {
       </TouchableOpacity>
     );
   };
+  console.log('SHOW MODAL', openCreateBookModal);
   return (
     <>
       <SafeAreaView>
@@ -48,9 +53,16 @@ const Books = ({navigation}) => {
         />
       </SafeAreaView>
 
-      <TouchableOpacity style={styles.addButtonContainer}>
+      <TouchableOpacity
+        style={styles.addButtonContainer}
+        onPress={() => setCreateBook(true)}>
         <Image source={require('../add.png')} style={{width: 60, height: 60}} />
       </TouchableOpacity>
+
+      <AddBookModal
+        openModal={openCreateBookModal}
+        closeModalFunction={() => setCreateBook(false)}
+      />
     </>
   );
 };
